@@ -158,8 +158,8 @@ namespace lpp.ViewModels
             AxisX = new Axis
             {
                 Title = "Ось X",
-                MinValue = -50,
-                MaxValue = 50,
+                MinValue = -20,
+                MaxValue = 20,
                 Separator = new Separator
                 {
                     Step = 1
@@ -168,8 +168,8 @@ namespace lpp.ViewModels
             AxisY = new Axis
             {
                 Title = "Ось Y",
-                MinValue = -50,
-                MaxValue = 50,
+                MinValue = -20,
+                MaxValue = 20,
                 Separator = new Separator
                 {
                     Step = 1
