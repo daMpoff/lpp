@@ -60,96 +60,129 @@ namespace lpp.ViewModels
         public ViewModel()
         {
             Initialize();
+
+            // Инициализация команды для обработки события изменения диапазона
             RangeChangedCommand = new RelayCommand<RangeChangedEventArgs>
             {
                 ExecuteDelegate = e =>
                 {
+                    SeriesCollection.Clear();
+
+                    // Список уравнений
                     List<LinearEquation> equations = new List<LinearEquation>
                     {
                         new LinearEquation(4, 9, 36, Sign.LessEqually),
                         new LinearEquation(2, 1, 11, Sign.LessEqually),
                     };
 
-                    SeriesCollection.Clear();
-                    AxisLine yAxis = new AxisLine("Y", 0, AxisY.MinValue, 0, AxisY.MaxValue);
-                    AxisLine xAxis = new AxisLine("X", AxisX.MinValue, 0, AxisX.MaxValue, 0);
-                    AxisLine yLessThan5 = new AxisLine("Y<5", AxisX.MinValue, 5, AxisX.MaxValue, 5);
+                    // Добавляем осевые линии
+                    AddAxisLines();
 
-                    // Добавление линий в коллекцию
-                    SeriesCollection.Add(new LineSeries
+                    // Добавляем пересечения прямых
+                    AddIntersections(equations);
+
+                    // Добавляем уравнения
+                    AddEquationLines(equations);
+                }
+            };
+        }
+        // Метод для добавления осевых линий в SeriesCollection
+        private void AddAxisLines()
+        {
+            AxisLine yAxis = new AxisLine("Y", 0, AxisY.MinValue, 0, AxisY.MaxValue);
+            AxisLine xAxis = new AxisLine("X", AxisX.MinValue, 0, AxisX.MaxValue, 0);
+            AxisLine yLessThan5 = new AxisLine("Y<5", AxisX.MinValue, 5, AxisX.MaxValue, 5);
+
+            SeriesCollection.Add(CreateLineSeries(yAxis));
+            SeriesCollection.Add(CreateLineSeries(xAxis));
+            SeriesCollection.Add(CreateLineSeries(yLessThan5));
+        }
+
+        // Метод для добавления точек пересечения прямых в SeriesCollection
+        private void AddIntersections(List<LinearEquation> equations)
+        {
+            for (int i = 0; i < equations.Count; i++)
+            {
+                for (int j = i + 1; j < equations.Count; j++)
+                {
+                    Point intersection = LinearEquation.FindIntersection(equations[i], equations[j]);
+
+                    if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
                     {
-                        Title = yAxis.Title,
-                        Values = yAxis.Values,
-                        LineSmoothness = 0,
-                        PointGeometrySize = 0,
-                    });
-                    SeriesCollection.Add(new LineSeries
-                    {
-                        Title = xAxis.Title,
-                        Values = xAxis.Values,
-                        LineSmoothness = 0,
-                        PointGeometrySize = 0,
-                    });
-                    SeriesCollection.Add(new LineSeries
-                    {
-                        Title = yLessThan5.Title,
-                        Values = yLessThan5.Values,
-                        LineSmoothness = 0,
-                        PointGeometrySize = 0,
-                    });
-
-                    for (int i = 0; i < equations.Count; i++)
-                    {
-                        for (int j = i + 1; j < equations.Count; j++)
-                        {
-                            Point intersection = LinearEquation.FindIntersection(equations[i], equations[j]);
-
-                            if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
-                            {
-                                SeriesCollection.Add(new ScatterSeries
-                                {
-                                    Title = $"Пересечение прямой {i + 1} и {j + 1}",
-                                    Values = new ChartValues<ObservablePoint>
-                                    {
-                                        new ObservablePoint(intersection.X, intersection.Y)
-                                    },
-                                    Stroke = Brushes.Red,
-                                    Fill = Brushes.Red,
-                                });
-                            }
-                        }
-
-                        Point intersectionWithXAxis = new Point(equations[i].X2, 0);
-                        Point intersectionWithYAxis = new Point(0, equations[i].X1);
-
-                        if (!double.IsNaN(intersectionWithXAxis.X) && !double.IsNaN(intersectionWithXAxis.Y))
-                        {
-                            SeriesCollection.Add(new ScatterSeries
-                            {
-                                Title = $"Пересечения с осями (Прямая {i + 1})",
-                                Values = new ChartValues<ObservablePoint>
-                                {
-                                    new ObservablePoint(intersectionWithXAxis.X, intersectionWithXAxis.Y),
-                                    new ObservablePoint(intersectionWithYAxis.X, intersectionWithYAxis.Y)
-                                },
-                                Stroke = Brushes.Blue,
-                                Fill = Brushes.Blue,
-                            });
-                        }
-                    }
-
-                    foreach (var equation in equations)
-                    {
-                        ChartValues<ObservablePoint> borderPoints = FindBorderPoints(AxisX.MinValue, AxisX.MaxValue, equation.LineSlopeCoefficient.M, equation.LineSlopeCoefficient.B);
-                        SeriesCollection.Add(new LineSeries
-                        {
-                            Title = $"Прямая {equations.IndexOf(equation) + 1}",
-                            Values = borderPoints,
-                            LineSmoothness = 0,
-                            PointGeometrySize = 0
-                        });
+                        SeriesCollection.Add(CreateScatterSeries($"Пересечение прямой {i + 1} и {j + 1}", intersection, Brushes.Red));
                     }
                 }
+
+                // Пересечения с осями
+                AddAxisIntersections(equations[i], i);
+            }
+        }
+
+        // Метод для добавления пересечений с осями
+        private void AddAxisIntersections(LinearEquation equation, int index)
+        {
+            Point intersectionWithXAxis = new Point(equation.X2, 0);
+            Point intersectionWithYAxis = new Point(0, equation.X1);
+
+            if (!double.IsNaN(intersectionWithXAxis.X) && !double.IsNaN(intersectionWithXAxis.Y))
+            {
+                SeriesCollection.Add(new ScatterSeries
+                {
+                    Title = $"Пересечения с осями (Прямая {index + 1})",
+                    Values = new ChartValues<ObservablePoint>
+                    {
+                        new ObservablePoint(intersectionWithXAxis.X, intersectionWithXAxis.Y),
+                        new ObservablePoint(intersectionWithYAxis.X, intersectionWithYAxis.Y)
+                    },
+                    Stroke = Brushes.Blue,
+                    Fill = Brushes.Blue,
+                });
+            }
+        }
+
+        // Метод для добавления уравнений в SeriesCollection
+        private void AddEquationLines(List<LinearEquation> equations)
+        {
+            foreach (var equation in equations)
+            {
+                ChartValues<ObservablePoint> borderPoints = FindBorderPoints(AxisX.MinValue, AxisX.MaxValue, equation.LineSlopeCoefficient.M, equation.LineSlopeCoefficient.B);
+                SeriesCollection.Add(CreateLineSeries($"Прямая {equations.IndexOf(equation) + 1}", borderPoints));
+            }
+        }
+
+        // Метод для создания LineSeries
+        private LineSeries CreateLineSeries(AxisLine axisLine)
+        {
+            return new LineSeries
+            {
+                Title = axisLine.Title,
+                Values = axisLine.Values,
+                LineSmoothness = 0,
+                PointGeometrySize = 0
+            };
+        }
+
+        // Перегруженный метод для создания LineSeries для уравнений
+        private LineSeries CreateLineSeries(string title, ChartValues<ObservablePoint> values)
+        {
+            return new LineSeries
+            {
+                Title = title,
+                Values = values,
+                LineSmoothness = 0,
+                PointGeometrySize = 0
+            };
+        }
+
+        // Метод для создания ScatterSeries
+        private ScatterSeries CreateScatterSeries(string title, Point intersection, Brush color)
+        {
+            return new ScatterSeries
+            {
+                Title = title,
+                Values = new ChartValues<ObservablePoint> { new ObservablePoint(intersection.X, intersection.Y) },
+                Stroke = color,
+                Fill = color,
             };
         }
 
