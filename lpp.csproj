@@ -70,6 +70,7 @@
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="Models\AxisLine.cs" />
     <Compile Include="Models\LinearEquation.cs" />
+    <Compile Include="Models\LineConstraint.cs" />
     <Compile Include="Models\LineSlopeCoefficient.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />

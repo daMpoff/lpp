@@ -74,15 +74,24 @@ namespace lpp.ViewModels
                         new LinearEquation(4, 9, 36, Sign.LessEqually),
                         new LinearEquation(2, 1, 11, Sign.LessEqually),
                     };
+                    List<LineConstraint> constraints = new List<LineConstraint>
+                    {
+                        new LineConstraint(null,5,Sign.LessEqually)//y<5
+                    };
 
                     // Добавляем осевые линии
                     AddAxisLines();
+
+                    AddConstraints(constraints);
 
                     // Добавляем пересечения прямых
                     AddIntersections(equations);
 
                     // Добавляем уравнения
                     AddEquationLines(equations);
+
+                    AddIntersecionWithConstraint(equations, constraints);
+
                 }
             };
         }
@@ -91,11 +100,9 @@ namespace lpp.ViewModels
         {
             AxisLine yAxis = new AxisLine("Y", 0, AxisY.MinValue, 0, AxisY.MaxValue);
             AxisLine xAxis = new AxisLine("X", AxisX.MinValue, 0, AxisX.MaxValue, 0);
-            AxisLine yLessThan5 = new AxisLine("Y<5", AxisX.MinValue, 5, AxisX.MaxValue, 5);
 
             SeriesCollection.Add(CreateLineSeries(yAxis));
             SeriesCollection.Add(CreateLineSeries(xAxis));
-            SeriesCollection.Add(CreateLineSeries(yLessThan5));
         }
 
         // Метод для добавления точек пересечения прямых в SeriesCollection
@@ -117,7 +124,30 @@ namespace lpp.ViewModels
                 AddAxisIntersections(equations[i], i);
             }
         }
-
+        private void AddIntersecionWithConstraint(List<LinearEquation> equations, List<LineConstraint> constraints)
+        {
+            for (int i = 0; i < equations.Count; i++)
+            {
+                for (int j = 0; j < constraints.Count; j++)
+                {
+                    Point intersection;
+                    if (constraints[j].FixedX == null)
+                    {
+                        double x = (double)((equations[i].B - (equations[i].A1 * constraints[j].FixedY)) / equations[i].A2);
+                        intersection = new Point(x, (double)constraints[j].FixedY);
+                    }
+                    else
+                    {
+                        double y = (double)((equations[i].B - (equations[i].A2 * constraints[j].FixedX)) / equations[i].A1);
+                        intersection = new Point((double)constraints[j].FixedX, y);
+                    }
+                    if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
+                    {
+                        SeriesCollection.Add(CreateScatterSeries($"Пересечение прямой {i + 1} и ограничения {j + 1}", intersection, Brushes.Black));
+                    }
+                }
+            }
+        }
         // Метод для добавления пересечений с осями
         private void AddAxisIntersections(LinearEquation equation, int index)
         {
@@ -132,10 +162,10 @@ namespace lpp.ViewModels
                     Values = new ChartValues<ObservablePoint>
                     {
                         new ObservablePoint(intersectionWithXAxis.X, intersectionWithXAxis.Y),
-                        new ObservablePoint(intersectionWithYAxis.X, intersectionWithYAxis.Y)
+                        new ObservablePoint(intersectionWithYAxis.X, intersectionWithYAxis.Y),
                     },
-                    Stroke = Brushes.Blue,
-                    Fill = Brushes.Blue,
+                    Stroke = Brushes.Black,
+                    Fill = Brushes.Black,
                 });
             }
         }
@@ -147,6 +177,46 @@ namespace lpp.ViewModels
             {
                 ChartValues<ObservablePoint> borderPoints = FindBorderPoints(AxisX.MinValue, AxisX.MaxValue, equation.LineSlopeCoefficient.M, equation.LineSlopeCoefficient.B);
                 SeriesCollection.Add(CreateLineSeries($"Прямая {equations.IndexOf(equation) + 1}", borderPoints));
+            }
+        }
+        // Метод для добавления ограничений в SeriesCollection
+        private void AddConstraints(List<LineConstraint> constraints)
+        {
+            foreach (var constraint in constraints)
+            {
+                if (constraint.FixedY.HasValue)
+                {
+                    ChartValues<ObservablePoint> borderPoints = FindBorderPoints(AxisX.MinValue, AxisX.MaxValue, 0, (double)constraint.FixedY);
+
+                    LineSeries constraintLine = new LineSeries
+                    {
+                        Title = $"Ограничение Y {constraint.FixedY}",
+                        Values = borderPoints,
+                        Stroke = Brushes.Gray,
+                        LineSmoothness = 0,
+                        PointGeometrySize = 0,
+                        StrokeDashArray = new DoubleCollection { 2, 2 } // Пунктирная линия
+                    };
+
+                    SeriesCollection.Add(constraintLine);
+                }
+                else if (constraint.FixedX.HasValue)
+                {
+                    // Ограничение по X
+                    ScatterSeries constraintLine = new ScatterSeries
+                    {
+                        Title = $"Ограничение X {constraint.FixedX}",
+                        Values = new ChartValues<ObservablePoint>
+                {
+                    new ObservablePoint((double)constraint.FixedX, AxisY.MinValue),
+                    new ObservablePoint((double)constraint.FixedX, AxisY.MaxValue)
+                },
+                        Stroke = Brushes.Gray,
+                        StrokeDashArray = new DoubleCollection { 2, 2 } // Пунктирная линия
+                    };
+
+                    SeriesCollection.Add(constraintLine);
+                }
             }
         }
 
