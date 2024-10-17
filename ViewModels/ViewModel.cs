@@ -135,15 +135,21 @@ namespace lpp.ViewModels
                     {
                         double x = (double)((equations[i].B - (equations[i].A1 * constraints[j].FixedY)) / equations[i].A2);
                         intersection = new Point(x, (double)constraints[j].FixedY);
+                        if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
+                        {
+                            SeriesCollection.Add(CreateScatterSeries($"Пересечение прямой {i + 1} и ограничения {j + 1}", intersection, Brushes.Black));
+                            SeriesCollection.Add(CreateScatterSeries($"Пересечение ограничения {j + 1} c осью", new Point(0, (double)constraints[j].FixedY), Brushes.Black));
+                        }
                     }
                     else
                     {
                         double y = (double)((equations[i].B - (equations[i].A2 * constraints[j].FixedX)) / equations[i].A1);
                         intersection = new Point((double)constraints[j].FixedX, y);
-                    }
-                    if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
-                    {
-                        SeriesCollection.Add(CreateScatterSeries($"Пересечение прямой {i + 1} и ограничения {j + 1}", intersection, Brushes.Black));
+                        if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
+                        {
+                            SeriesCollection.Add(CreateScatterSeries($"Пересечение прямой {i + 1} и ограничения {j + 1}", intersection, Brushes.Black));
+                            SeriesCollection.Add(CreateScatterSeries($"Пересечение ограничения {j + 1} c осью", new Point((double)constraints[j].FixedX, 0), Brushes.Black));
+                        }
                     }
                 }
             }
