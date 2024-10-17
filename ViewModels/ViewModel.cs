@@ -92,9 +92,16 @@ namespace lpp.ViewModels
 
                     AddIntersecionWithConstraint(equations, constraints);
 
+                    AddZeroPoint();
                 }
             };
         }
+
+        private void AddZeroPoint()
+        {
+            SeriesCollection.Add(CreateScatterSeries($"Точка пересечения осей", new Point(0, 0), Brushes.Black));
+        }
+
         // Метод для добавления осевых линий в SeriesCollection
         private void AddAxisLines()
         {
