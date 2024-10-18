@@ -128,12 +128,12 @@ namespace lpp.ViewModels
             // Создание линии стрелки
             LineSeries arrowLine = new LineSeries
             {
-                Title = "Стрелка",
+                Title = null,
                 Values = new ChartValues<ObservablePoint>
-        {
-            new ObservablePoint(start.X, start.Y),
-            new ObservablePoint(end.X, end.Y)
-        },
+                {
+                    new ObservablePoint(start.X, start.Y),
+                    new ObservablePoint(end.X, end.Y)
+                },
                 Stroke = Brushes.Black,  // Цвет линии
                 Fill = Brushes.Transparent,
                 LineSmoothness = 0, // Прямая линия
@@ -158,11 +158,12 @@ namespace lpp.ViewModels
             // Линия для одного конца стрелки
             LineSeries arrowHeadLine1 = new LineSeries
             {
+                Title = null,
                 Values = new ChartValues<ObservablePoint>
-        {
-            new ObservablePoint(end.X, end.Y),
-            new ObservablePoint(arrowEnd1.X, arrowEnd1.Y)
-        },
+                {
+                    new ObservablePoint(end.X, end.Y),
+                    new ObservablePoint(arrowEnd1.X, arrowEnd1.Y)
+                },
                 Stroke = Brushes.Black,
                 Fill = Brushes.Transparent,
                 LineSmoothness = 0,
@@ -172,11 +173,12 @@ namespace lpp.ViewModels
             // Линия для другого конца стрелки
             LineSeries arrowHeadLine2 = new LineSeries
             {
+                Title = null,
                 Values = new ChartValues<ObservablePoint>
-        {
-            new ObservablePoint(end.X, end.Y),
-            new ObservablePoint(arrowEnd2.X, arrowEnd2.Y)
-        },
+                {
+                    new ObservablePoint(end.X, end.Y),
+                    new ObservablePoint(arrowEnd2.X, arrowEnd2.Y)
+                },
                 Stroke = Brushes.Black,
                 Fill = Brushes.Transparent,
                 LineSmoothness = 0,
@@ -200,10 +202,10 @@ namespace lpp.ViewModels
             {
                 Title = "Целевая функция",
                 Values = new ChartValues<ObservablePoint>
-        {
-            new ObservablePoint(start.X, start.Y),
-            new ObservablePoint(end.X, end.Y)
-        },
+                {
+                    new ObservablePoint(start.X, start.Y),
+                    new ObservablePoint(end.X, end.Y)
+                },
                 Stroke = Brushes.Black,  // Цвет линии
                 Fill = Brushes.Transparent, // Оставляем заливку прозрачной
                 LineSmoothness = 0, // Прямая линия
@@ -216,10 +218,10 @@ namespace lpp.ViewModels
             {
                 Title = "Перпендикуляр на ось X",
                 Values = new ChartValues<ObservablePoint>
-        {
-            new ObservablePoint(end.X, end.Y),
-            new ObservablePoint(end.X, 0) // Проекция на ось X
-        },
+                {
+                    new ObservablePoint(end.X, end.Y),
+                    new ObservablePoint(end.X, 0) // Проекция на ось X
+                },
                 Stroke = Brushes.Gray, // Цвет линии
                 Fill = Brushes.Transparent,
                 LineSmoothness = 0, // Прямая линия
@@ -232,10 +234,10 @@ namespace lpp.ViewModels
             {
                 Title = "Перпендикуляр на ось Y",
                 Values = new ChartValues<ObservablePoint>
-        {
-            new ObservablePoint(end.X, end.Y),
-            new ObservablePoint(0, end.Y) // Проекция на ось Y
-        },
+                {
+                    new ObservablePoint(end.X, end.Y),
+                    new ObservablePoint(0, end.Y) // Проекция на ось Y
+                },
                 Stroke = Brushes.Gray, // Цвет линии
                 Fill = Brushes.Transparent,
                 LineSmoothness = 0, // Прямая линия
