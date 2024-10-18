@@ -4,6 +4,7 @@ using LiveCharts.Events;
 using LiveCharts.Wpf;
 using lpp.Commands;
 using lpp.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Media;
@@ -16,6 +17,7 @@ namespace lpp.ViewModels
         private Axis axisY;
         private SeriesCollection seriesCollection;
         private CartesianChart chart;
+        private TargetFunction targetFunction;
         public RelayCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 
         public CartesianChart Chart
@@ -57,6 +59,19 @@ namespace lpp.ViewModels
             }
         }
 
+        public TargetFunction TargetFunction
+        {
+            get
+            {
+                return targetFunction;
+            }
+            set
+            {
+                targetFunction = value;
+                OnPropertyChanged(nameof(TargetFunction));
+            }
+        }
+
         public ViewModel()
         {
             Initialize();
@@ -78,6 +93,7 @@ namespace lpp.ViewModels
                     {
                         new LineConstraint(null,5,Sign.LessEqually)//y<5
                     };
+                    TargetFunction = new TargetFunction(3, 4, Target.Max);
 
                     // Добавляем осевые линии
                     AddAxisLines();
@@ -90,6 +106,8 @@ namespace lpp.ViewModels
                     // Добавляем уравнения
                     AddEquationLines(equations);
 
+                    AddTargetFunction();
+
                     AddIntersecionWithConstraint(equations, constraints);
 
                     AddZeroPoint();
@@ -100,6 +118,136 @@ namespace lpp.ViewModels
         private void AddZeroPoint()
         {
             SeriesCollection.Add(CreateScatterSeries($"Точка пересечения осей", new Point(0, 0), Brushes.Black));
+        }
+        private void AddArrow()
+        {
+            // Задаем начальную и конечную точки стрелки
+            Point start = new Point(0, 0);
+            Point end = new Point(TargetFunction.C2, TargetFunction.C1);
+
+            // Создание линии стрелки
+            LineSeries arrowLine = new LineSeries
+            {
+                Title = "Стрелка",
+                Values = new ChartValues<ObservablePoint>
+        {
+            new ObservablePoint(start.X, start.Y),
+            new ObservablePoint(end.X, end.Y)
+        },
+                Stroke = Brushes.Black,  // Цвет линии
+                Fill = Brushes.Transparent,
+                LineSmoothness = 0, // Прямая линия
+                PointGeometrySize = 0
+            };
+
+            // Вычисляем направление для концов стрелки
+            double arrowLength = 0.5; // Длина концов стрелки
+            double angle = Math.Atan2(end.Y - start.Y, end.X - start.X); // Угол наклона линии
+
+            // Создание концов стрелки
+            Point arrowEnd1 = new Point(
+                end.X - arrowLength * Math.Cos(angle - Math.PI / 6), // -30 градусов
+                end.Y - arrowLength * Math.Sin(angle - Math.PI / 6)
+            );
+
+            Point arrowEnd2 = new Point(
+                end.X - arrowLength * Math.Cos(angle + Math.PI / 6), // +30 градусов
+                end.Y - arrowLength * Math.Sin(angle + Math.PI / 6)
+            );
+
+            // Линия для одного конца стрелки
+            LineSeries arrowHeadLine1 = new LineSeries
+            {
+                Values = new ChartValues<ObservablePoint>
+        {
+            new ObservablePoint(end.X, end.Y),
+            new ObservablePoint(arrowEnd1.X, arrowEnd1.Y)
+        },
+                Stroke = Brushes.Black,
+                Fill = Brushes.Transparent,
+                LineSmoothness = 0,
+                PointGeometrySize = 0
+            };
+
+            // Линия для другого конца стрелки
+            LineSeries arrowHeadLine2 = new LineSeries
+            {
+                Values = new ChartValues<ObservablePoint>
+        {
+            new ObservablePoint(end.X, end.Y),
+            new ObservablePoint(arrowEnd2.X, arrowEnd2.Y)
+        },
+                Stroke = Brushes.Black,
+                Fill = Brushes.Transparent,
+                LineSmoothness = 0,
+                PointGeometrySize = 0
+            };
+
+            // Добавляем линии стрелки в коллекцию
+            SeriesCollection.Add(arrowLine);
+            SeriesCollection.Add(arrowHeadLine1);
+            SeriesCollection.Add(arrowHeadLine2);
+        }
+
+        private void AddTargetFunction()
+        {
+            // Начальная и конечная точки целевой функции
+            Point start = new Point(0, 0);
+            Point end = new Point(TargetFunction.C2, TargetFunction.C1);
+
+            // Создание линии для целевой функции
+            LineSeries targetFunctionLine = new LineSeries
+            {
+                Title = "Целевая функция",
+                Values = new ChartValues<ObservablePoint>
+        {
+            new ObservablePoint(start.X, start.Y),
+            new ObservablePoint(end.X, end.Y)
+        },
+                Stroke = Brushes.Black,  // Цвет линии
+                Fill = Brushes.Transparent, // Оставляем заливку прозрачной
+                LineSmoothness = 0, // Прямая линия
+                PointGeometrySize = 0,
+                StrokeDashArray = new DoubleCollection { 3, 2 } // Пунктирная линия
+            };
+
+            // Создание вертикального перпендикуляра (из точки end на ось X)
+            LineSeries verticalLine = new LineSeries
+            {
+                Title = "Перпендикуляр на ось X",
+                Values = new ChartValues<ObservablePoint>
+        {
+            new ObservablePoint(end.X, end.Y),
+            new ObservablePoint(end.X, 0) // Проекция на ось X
+        },
+                Stroke = Brushes.Gray, // Цвет линии
+                Fill = Brushes.Transparent,
+                LineSmoothness = 0, // Прямая линия
+                PointGeometrySize = 0,
+                StrokeDashArray = new DoubleCollection { 2, 2 } // Пунктирная линия
+            };
+
+            // Создание горизонтального перпендикуляра (из точки end на ось Y)
+            LineSeries horizontalLine = new LineSeries
+            {
+                Title = "Перпендикуляр на ось Y",
+                Values = new ChartValues<ObservablePoint>
+        {
+            new ObservablePoint(end.X, end.Y),
+            new ObservablePoint(0, end.Y) // Проекция на ось Y
+        },
+                Stroke = Brushes.Gray, // Цвет линии
+                Fill = Brushes.Transparent,
+                LineSmoothness = 0, // Прямая линия
+                PointGeometrySize = 0,
+                StrokeDashArray = new DoubleCollection { 2, 2 } // Пунктирная линия
+            };
+
+            // Добавляем линии целевой функции и перпендикуляры в коллекцию
+            SeriesCollection.Add(targetFunctionLine);
+            SeriesCollection.Add(verticalLine);
+            SeriesCollection.Add(horizontalLine);
+            AddArrow();
         }
 
         // Метод для добавления осевых линий в SeriesCollection
