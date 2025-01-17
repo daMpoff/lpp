@@ -20,16 +20,6 @@ namespace lpp.ViewModels
         private TargetFunction targetFunction;
         public RelayCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 
-        public CartesianChart Chart
-        {
-            get => chart;
-            set
-            {
-                chart = value;
-                OnPropertyChanged(nameof(Chart));
-            }
-        }
-
         public SeriesCollection SeriesCollection
         {
             get => seriesCollection;
