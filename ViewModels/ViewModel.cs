@@ -309,8 +309,7 @@ namespace lpp.ViewModels
                     Point intersection;
                     if (constraints[j].FixedX == null)
                     {
-                        double x = (double)((equations[i].B - (equations[i].A1 * constraints[j].FixedY)) /
-                                            equations[i].A2);
+                        double x = (double)((equations[i].B - (equations[i].A1 * constraints[j].FixedY)) / equations[i].A2);
                         intersection = new Point(x, (double)constraints[j].FixedY);
                         if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
                         {
@@ -322,8 +321,7 @@ namespace lpp.ViewModels
                     }
                     else
                     {
-                        double y = (double)((equations[i].B - (equations[i].A2 * constraints[j].FixedX)) /
-                                            equations[i].A1);
+                        double y = (double)((equations[i].B - (equations[i].A2 * constraints[j].FixedX)) / equations[i].A1);
                         intersection = new Point((double)constraints[j].FixedX, y);
                         if (intersection != null && !double.IsNaN(intersection.X) && !double.IsNaN(intersection.Y))
                         {
