@@ -16,7 +16,6 @@ namespace lpp.ViewModels
         private Axis axisX;
         private Axis axisY;
         private SeriesCollection seriesCollection;
-        private CartesianChart chart;
         private TargetFunction targetFunction;
         public RelayCommand<RangeChangedEventArgs> RangeChangedCommand { get; set; }
 
