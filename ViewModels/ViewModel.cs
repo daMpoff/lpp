@@ -65,6 +65,19 @@ namespace lpp.ViewModels
         public ViewModel()
         {
             Initialize();
+            // Список уравнений
+            List<LinearEquation> equations = new List<LinearEquation>
+            {
+                new LinearEquation(4, 9, 36, Sign.LessEqually),
+                new LinearEquation(2, 1, 11, Sign.LessEqually),
+            };
+            // Ограничения
+            List<LineConstraint> constraints = new List<LineConstraint>
+            {
+                new LineConstraint(null, 5, Sign.LessEqually)
+            };
+            // Целевая функция
+            TargetFunction = new TargetFunction(3, 4, Target.Max);
 
             // Инициализация команды для обработки события изменения диапазона
             RangeChangedCommand = new RelayCommand<RangeChangedEventArgs>
@@ -72,20 +85,6 @@ namespace lpp.ViewModels
                 ExecuteDelegate = e =>
                 {
                     SeriesCollection.Clear();
-
-                    // Список уравнений
-                    List<LinearEquation> equations = new List<LinearEquation>
-                    {
-                        new LinearEquation(4, 9, 36, Sign.LessEqually),
-                        new LinearEquation(2, 1, 11, Sign.LessEqually),
-                    };
-                    // Ограничения
-                    List<LineConstraint> constraints = new List<LineConstraint>
-                    {
-                        new LineConstraint(null, 5, Sign.LessEqually)
-                    };
-                    // Целевая функция
-                    TargetFunction = new TargetFunction(3, 4, Target.Max);
 
                     // Добавляем осевые линии
                     AddAxisLines();
