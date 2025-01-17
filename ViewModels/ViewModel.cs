@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace lpp.ViewModels
 {
-    public partial class ViewModel : INotifyPropertyChanged
+    public class ViewModel : INotifyPropertyChanged
     {
         private Axis axisX;
         private Axis axisY;
