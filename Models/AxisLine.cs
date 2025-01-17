@@ -23,20 +23,5 @@ namespace lpp.Models
             Slope = (y2 - y1) / (x2 - x1);
             Intercept = y1 - Slope * x1;
         }
-
-        // Метод для поиска пересечения с другим уравнением
-        public Point FindIntersection(double otherSlope, double otherIntercept)
-        {
-            if (Slope == otherSlope)
-            {
-                // Линии параллельны
-                return null;
-            }
-
-            double x = (otherIntercept - Intercept) / (Slope - otherSlope);
-            double y = Slope * x + Intercept;
-
-            return new Point(x, y);
-        }
     }
 }

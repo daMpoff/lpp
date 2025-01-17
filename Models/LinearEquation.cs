@@ -1,12 +1,5 @@
 ﻿namespace lpp.Models
 {
-    public enum Sign
-    {
-        LessEqually,
-        MoreEqually,
-        Equally
-    }
-
     public class LinearEquation
     {
         public double A1 { get; set; }
