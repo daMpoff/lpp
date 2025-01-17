@@ -74,7 +74,8 @@
     <Compile Include="Models\LineSlopeCoefficient.cs" />
     <Compile Include="Models\Point.cs" />
     <Compile Include="Models\Sign.cs" />
-    <Compile Include="ViewModels\TargetFunction.cs" />
+    <Compile Include="Models\Target.cs" />
+    <Compile Include="Models\TargetFunction.cs" />
     <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -1,10 +1,5 @@
-﻿namespace lpp.ViewModels
+﻿namespace lpp.Models
 {
-    public enum Target
-    {
-        Min,
-        Max
-    }
     public class TargetFunction
     {
         public double C1 { get; set; }
